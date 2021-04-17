@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>B.D.S</title>
+    <!-- Font Awesome-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Google Fonts-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap">
+    <!-- Bootstrap core CSS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css"
+        integrity="sha512-oc9+XSs1H243/FRN9Rw62Fn8EtxjEYWHXRvjS43YtueEewbS6ObfXcJNyohjHqVKFPoXXUxwc+q1K7Dee6vv9g=="
+        crossorigin="anonymous" />
+    <!-- Material Design Bootstrap-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+    <!-- Noty CSS-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.css" rel="stylesheet">
+    <!-- Noty CSS Map-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.css.map" rel="stylesheet">
+    <!-- Noty CSS Map-->
+    <link href="/css/site.css" rel="stylesheet">
+    <!-- reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LdrHAEaAAAAAIwUQllvlC2DPy9n_4DtvF8hIi18"></script>
+    <style>
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #2bbbad;
+            color: white;
+        }
+
+        td,
+        th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <!-- Navbar-->
+        <nav class="mb-1 navbar navbar-expand-lg navbar-dark default-color">
+            <a class="navbar-brand" href="#"><img src="../images/logo.png" alt="Logo" style="width:40px;"></a><button
+                class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-333"
+                aria-controls="navbarSupportedContent-333" aria-expanded="false" aria-label="Toggle navigation"><span
+                    class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent-333">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active"><a class="nav-link active" href="manage_users.html">Manage users</a>
+                    <li class="nav-item active"><a class="nav-link active" href="log.html">View logs</a></li>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto nav-flex-icons">
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
+                                class="fas fa-user"></i></a>
+                        <div class="dropdown-menu dropdown-menu-right dropdown-default"
+                            aria-labelledby="navbarDropdownMenuLink-333"><a class="dropdown-item" href="profile.html">My
+                                profile</a><a id="logoutButton" class="dropdown-item" href="#">Log out</a></div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- /.Navbar-->
+        <div style="display: flex;width: 100%;justify-content: center;">
+            <table >
+                <thead>
+                    <tr>
+                        <th>Date/Time</th>
+                        <th>Level</th>
+                        <th>File</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody style="overflow: auto; height:100% ;" id="tBody">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- JQuery-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap tooltips-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.5.4/umd/popper.min.js"
+        integrity="sha512-7yA/d79yIhHPvcrSiB8S/7TyX0OxlccU8F/kuB8mHYjLlF1MInPbEohpoqfz0AILoq5hoD7lELZAYYHbyeEjag=="
+        crossorigin="anonymous"></script>
+    <!-- Bootstrap core JavaScript-->
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/js/bootstrap.min.js"
+        integrity="sha512-8qmis31OQi6hIRgvkht0s6mCOittjMa9GMqtK9hes5iEQBQE/Ca6yGE5FsW36vyipGoWQswBj/QBm2JR086Rkw=="
+        crossorigin="anonymous"></script>
+    <!-- MDB core JavaScript-->
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+    <!-- Noty JS-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+    <!-- Web App JS-->
+    <script src="/js/global.js"></script>
+    <script>
+        let xhr = new XMLHttpRequest();
+        const tbody = document.getElementById("tBody")
+        xhr.open("GET", baseUrl + '/api/log');
+        xhr.setRequestHeader("authorization", 'Bearer ' + localStorage.getItem('token'))
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 0 || (xhr.status >= 200 && xhr.status < 400)) {
+                    let data = xhr.responseText.split('\n')
+                    data.forEach((x, y) => {
+                        if (!x.trim()) {
+                            return
+                        }
+                        let row = x.split("|")
+
+                        let dateTime = document.createElement('td')
+                        dateTime.style.color = "#608b4e";
+                        dateTime.textContent = row[0];
+                        let level = document.createElement("td")
+                        switch (row[1].trim()) {
+                            case "INFO":
+                                level.style.color = "#00aa00";
+                                break;
+                            case "WARN":
+                                level.style.color = "#ce9178";
+                                break;
+                            case "DEBUG":
+                                level.style.color = "#569cd6";
+                                break;
+                            case "ERROR":
+                                level.style.color = "#ff0000";
+                                break;
+                        }
+                        level.textContent = row[1];
+                        let file = document.createElement("td");
+                        file.style.color = "#569cd6";
+                        file.textContent = row[2];
+                        let message = document.createElement("td");
+                        message.textContent = row[3];
+                        let tr = document.createElement('tr');
+                        tr.appendChild(dateTime);
+                        tr.appendChild(level);
+                        tr.appendChild(file);
+                        tr.appendChild(message);
+                        tbody.appendChild(tr)
+
+                    })
+                } else {
+                    console.error(xhr.statusText);
+                    new Noty({
+                        type: 'error',
+                        timeout: '6000',
+                        layout: 'topCenter',
+                        theme: 'sunset',
+                        text: 'Unable retrieve file data',
+                    }).show();
+                }
+            }
+        }
+        xhr.send()
+    </script>
+</body>
+
+</html>

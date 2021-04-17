@@ -1,0 +1,7 @@
+plugins:
+ - serverless-apigw-binary
+
+custom:
+  apigwBinary:
+    types:
+      - 'multipart/form-data'

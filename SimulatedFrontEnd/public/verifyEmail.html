@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>verify email</title>
+    <!-- reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LdrHAEaAAAAAIwUQllvlC2DPy9n_4DtvF8hIi18"></script>
+    <script>
+        grecaptcha.ready(function () {
+            grecaptcha.execute('6LdrHAEaAAAAAIwUQllvlC2DPy9n_4DtvF8hIi18', { action: 'login' }).then(function(captcha){
+        let token= new URLSearchParams(window.location.search).get("token");
+        let xhr = new XMLHttpRequest();
+        let {protocol} = window.location
+        let outPut = JSON.stringify({token,captcha})
+        xhr.open("PATCH",protocol+"//"+window.location.hostname+":"+(protocol==="https:"?"5001":"5000")+"/api/user/register/verify");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState===XMLHttpRequest.DONE){
+                if(xhr.status===200){
+                    window.location.href="/login?emailVerify=1"
+                }else{
+                    new Noty({
+                        type: 'error',
+                        layout: 'topCenter',
+                        theme: 'sunset',
+                        timeout: '6000',
+                        text: 'Unable to update.',
+                    }).show();
+                }
+            }
+        }
+        xhr.send(outPut)
+    })})
+    </script>
+</head>
+<body>
+    <h1>Place waite...</h1>
+</body>
+</html>
